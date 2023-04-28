@@ -32,12 +32,16 @@ public record WeatherReading(String region, String country, String state, String
         Utility.verifyInRange(1, 31, "day", day);
         Utility.verifyInRange(1800, 3000, "year", year);
         Utility.verifyInRange(-99.0, 200.0, "avgTemperature", avgTemperature);
-
-
     }
 
+    /**
+     * Compares this WeatherReading to another WeatherReading, used for sorting
+     * @param other the WeatherReading to be compared.
+     * @return negative for less than, 0 for equal, or positive for greater than
+     */
     @Override
     public int compareTo(WeatherReading other) {
+        if (other == null) {return 1;}
         if (!country.equals(other.country)) {
             return country.compareTo(other.country);
         } else if (!state.equals(other.state)) {
@@ -53,12 +57,16 @@ public record WeatherReading(String region, String country, String state, String
         }
     }
 
+    /**
+     * Checks to see if the content is equal between two WeatherReading objects
+     * @param other   the WeatherReading to compare.
+     * @return        whether the content matches or not
+     */
     @Override
     public boolean equals(Object other) {
         if (other instanceof WeatherReading) {
             return this.compareTo((WeatherReading)other) == 0;
-        } else {
-            return false;
         }
+        return false;
     }
 }

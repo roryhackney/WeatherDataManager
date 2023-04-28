@@ -48,7 +48,7 @@ public class Utility {
         if (item - min < 0.000000) {
             throw new IllegalArgumentException(context + " cannot be less than " + min);
         }
-        if (item - max < 0.000000) {
+        if (item - max > 0.000000) {
             throw new IllegalArgumentException(context + " cannot be greater than " + max);
         }
     }
