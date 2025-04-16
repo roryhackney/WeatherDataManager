@@ -20,22 +20,29 @@ public class GlobalWeatherManager implements GlobalWeatherManagerInterface, Iter
      * @throws FileNotFoundException if weather data file not found
      */
     public GlobalWeatherManager(File dataFile) throws FileNotFoundException {
+//        int n = 0;
         readings = new ArrayList<>();
         Scanner fileScan = new Scanner(dataFile);
         fileScan.nextLine();
         while (fileScan.hasNextLine()) {
+//            n++;
             String line = fileScan.nextLine();
             Scanner lineScan = new Scanner(line);
             lineScan.useDelimiter(",");
-            readings.add(new WeatherReading(
-                    lineScan.next(),
-                    lineScan.next(),
-                    lineScan.next(),
-                    lineScan.next(),
-                    lineScan.nextInt(),
-                    lineScan.nextInt(),
-                    lineScan.nextInt(),
-                    lineScan.nextDouble()));
+            try {
+                WeatherReading r = new WeatherReading(
+                        lineScan.next(),
+                        lineScan.next(),
+                        lineScan.next(),
+                        lineScan.next(),
+                        lineScan.nextInt(),
+                        lineScan.nextInt(),
+                        lineScan.nextInt(),
+                        lineScan.nextDouble());
+                readings.add(r);
+            } catch (IllegalArgumentException err) {
+                // System.out.println("Skipping line " + n + " because: " + err);
+            }
             lineScan.close();
         }
         fileScan.close();
@@ -106,7 +113,28 @@ public class GlobalWeatherManager implements GlobalWeatherManagerInterface, Iter
      */
     @Override
     public CityListStats getCityListStats(String country, String state, String city) {
-        return null;
+        int startIndex = -1;
+        ArrayList<Integer> years = new ArrayList<>();
+        int n = 0;
+
+        for (int i = 0; i < readings.size(); i++) {
+            WeatherReading r = readings.get(i);
+            if (r.country().compareTo(country) > 0) break;
+            if (r.country().compareTo(country) < 0) continue;
+            //country is equal
+            if (r.state().compareTo(state) > 0) break;
+            if (r.state().compareTo(state) < 0) continue;
+            //state is equal
+            if (r.city().compareTo(city) > 0) break;
+            if (r.city().compareTo(city) < 0) continue;
+            //found the matching country state city
+            if (startIndex == -1) startIndex = i;
+            if (! years.contains(r.year())) years.add(r.year());
+            n++;
+
+        }
+        if (n == 0) return null;
+        return new CityListStats(startIndex, n, years);
     }
 
     /**
